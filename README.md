@@ -4,6 +4,8 @@ Leitura de **temperatura**, **umidade** e **qualidade do ar** com o Kit IoT Inic
 classificando o ar em três faixas (BOM / MODERADO / RUIM) com sinalização por LEDs e
 alarme sonoro.
 
+![Esquema de ligação](docs/esquema-ligacao.png)
+
 ## Por onde começar
 
 | Quero... | Arquivo |

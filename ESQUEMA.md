@@ -3,6 +3,18 @@
 Representação visual da montagem descrita em [hardware.json](hardware.json).
 Para o passo a passo e os testes, veja [MONTAGEM.md](MONTAGEM.md).
 
+![Esquema de ligação da estação de qualidade do ar](docs/esquema-ligacao.png)
+
+> **Como ler este desenho.** É um esquemático, não um layout de protoboard: o fundo
+> pontilhado é decorativo e não representa os furos nem os trilhos de alimentação. Ele mostra
+> *o que liga em quê*, não *em qual furo espetar*. Para a montagem física use a tabela de
+> pinos abaixo e o [MONTAGEM.md](MONTAGEM.md).
+>
+> **Em caso de divergência, a tabela de pinos manda.** Dois pontos do desenho merecem
+> conferência: o fio verde do LED verde termina no **D5** (o trecho horizontal dele passa na
+> altura do D4), e os cátodos dos três LEDs mais o negativo do buzzer precisam chegar de fato
+> à linha de GND comum.
+
 ---
 
 ## Diagrama geral
