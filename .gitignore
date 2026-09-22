@@ -1,0 +1,12 @@
+# Artefatos de compilação do arduino-cli
+build/
+*.bin
+*.elf
+*.hex
+*.map
+
+# Sistema
+.DS_Store
+
+# Configuração local do Claude Code
+.claude/

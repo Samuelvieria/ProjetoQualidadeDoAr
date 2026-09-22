@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "author": "Samuel Alves Vieira",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+
+    { "type": "wokwi-dht22", "id": "dht1", "top": -100, "left": 200,
+      "attrs": { "temperature": "25", "humidity": "55" } },
+
+    { "type": "wokwi-gas-sensor", "id": "gas1", "top": -110, "left": 330,
+      "attrs": { "ppm": "400" } },
+
+    { "type": "wokwi-photoresistor-sensor", "id": "ldr1", "top": 60, "left": 330,
+      "attrs": {} },
+
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": 200, "left": 330,
+      "attrs": {} },
+
+    { "type": "board-bmp180", "id": "bmp1", "top": 200, "left": 180,
+      "attrs": { "temperature": "25", "pressure": "101325" } },
+
+    { "type": "wokwi-led", "id": "ledVerde",    "top": -180, "left": -120, "attrs": { "color": "green" } },
+    { "type": "wokwi-led", "id": "ledAmarelo",  "top": -180, "left": -180, "attrs": { "color": "yellow" } },
+    { "type": "wokwi-led", "id": "ledVermelho", "top": -180, "left": -240, "attrs": { "color": "red" } },
+
+    { "type": "wokwi-resistor", "id": "rVerde",    "top": -100, "left": -120, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "rAmarelo",  "top": -100, "left": -180, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "rVermelho", "top": -100, "left": -240, "attrs": { "value": "220" } },
+
+    { "type": "wokwi-buzzer", "id": "bz1", "top": 100, "left": -200,
+      "attrs": { "volume": "0.1" } },
+
+    { "type": "wokwi-pushbutton", "id": "btn1", "top": 240, "left": -200,
+      "attrs": { "color": "blue" } }
+  ],
+  "connections": [
+    [ "dht1:VCC", "esp:3V3",   "red",   [ "v-20", "h-40" ] ],
+    [ "dht1:GND", "esp:GND.2", "black", [ "v-10", "h-40" ] ],
+    [ "dht1:SDA", "esp:4",     "green", [ "v0",   "h-40" ] ],
+
+    [ "gas1:VCC", "esp:3V3",   "red",   [ "v-30", "h-60" ] ],
+    [ "gas1:GND", "esp:GND.2", "black", [ "v-20", "h-60" ] ],
+    [ "gas1:AO",  "esp:34",    "orange",[ "v10",  "h-60" ] ],
+
+    [ "ldr1:VCC", "esp:3V3",   "red",   [ "v-20", "h-60" ] ],
+    [ "ldr1:GND", "esp:GND.2", "black", [ "v-10", "h-60" ] ],
+    [ "ldr1:AO",  "esp:35",    "orange",[ "v20",  "h-60" ] ],
+
+    [ "pot1:VCC", "esp:3V3",   "red",   [ "v20",  "h-60" ] ],
+    [ "pot1:GND", "esp:GND.3", "black", [ "v30",  "h-60" ] ],
+    [ "pot1:SIG", "esp:32",    "orange",[ "v40",  "h-60" ] ],
+
+    [ "bmp1:VCC", "esp:3V3",   "red",   [ "v20",  "h-30" ] ],
+    [ "bmp1:GND", "esp:GND.3", "black", [ "v30",  "h-30" ] ],
+    [ "bmp1:SDA", "esp:21",    "blue",  [ "v40",  "h-30" ] ],
+    [ "bmp1:SCL", "esp:22",    "purple",[ "v50",  "h-30" ] ],
+
+    [ "esp:25", "rVerde:1",    "green", [ "v-40", "h-60" ] ],
+    [ "esp:26", "rAmarelo:1",  "gold",  [ "v-50", "h-80" ] ],
+    [ "esp:27", "rVermelho:1", "red",   [ "v-60", "h-100" ] ],
+
+    [ "rVerde:2",    "ledVerde:A",    "green", [ "v-20" ] ],
+    [ "rAmarelo:2",  "ledAmarelo:A",  "gold",  [ "v-20" ] ],
+    [ "rVermelho:2", "ledVermelho:A", "red",   [ "v-20" ] ],
+
+    [ "ledVerde:C",    "esp:GND.1", "black", [ "v-30", "h40" ] ],
+    [ "ledAmarelo:C",  "esp:GND.1", "black", [ "v-40", "h60" ] ],
+    [ "ledVermelho:C", "esp:GND.1", "black", [ "v-50", "h80" ] ],
+
+    [ "bz1:2", "esp:14",    "purple", [ "v0", "h40" ] ],
+    [ "bz1:1", "esp:GND.1", "black",  [ "v10", "h40" ] ],
+
+    [ "btn1:1.l", "esp:13",    "blue",  [ "v0", "h40" ] ],
+    [ "btn1:2.l", "esp:GND.1", "black", [ "v10", "h40" ] ]
+  ]
+}

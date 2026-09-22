@@ -1,0 +1,111 @@
+{
+  "projeto": "Estacao de Qualidade do Ar",
+  "versao": "1.0.0",
+  "descricao": "Leitura de temperatura, umidade e qualidade do ar com NodeMCU ESP8266, com classificacao em tres faixas e alarme sonoro.",
+  "sketch": "esp8266_kit_real/esp8266_kit_real.ino",
+  "fqbn": "esp8266:esp8266:nodemcuv2",
+
+  "placa": {
+    "nome": "NodeMCU ESP8266 Amica",
+    "mcu": "ESP8266",
+    "tensao_logica_v": 3.3,
+    "adc": {
+      "pino": "A0",
+      "resolucao_bits": 10,
+      "escala_max": 1023,
+      "tensao_max_v": 3.3,
+      "observacao": "A placa Amica ja tem um divisor interno no A0. Ainda assim o MQ-135 precisa de divisor externo, porque sua saida chega a 5 V."
+    },
+    "pinos_proibidos": [
+      { "pino": "D8", "gpio": 15, "motivo": "pull-down interno; carga impede o boot" },
+      { "pino": "D4", "gpio": 2,  "motivo": "strapping pin; precisa estar HIGH no boot" },
+      { "pino": "D3", "gpio": 0,  "motivo": "strapping pin; LOW no boot entra em modo de gravacao" }
+    ]
+  },
+
+  "alimentacao": [
+    { "trilho": "3V3", "origem": "regulador da placa", "tensao_v": 3.3, "consumidores": ["dht11"] },
+    { "trilho": "Vin", "origem": "USB",                "tensao_v": 5.0, "consumidores": ["mq135"],
+      "nota": "O aquecedor do MQ-135 puxa ~150 mA, acima do que o regulador de 3,3 V entrega." }
+  ],
+
+  "componentes": [
+    {
+      "id": "dht11",
+      "nome": "Sensor de temperatura e umidade DHT11",
+      "tipo": "digital",
+      "protocolo": "1-wire proprietario",
+      "biblioteca": "DHT sensor library (Adafruit)",
+      "alimentacao": "3V3",
+      "variantes": [
+        { "pinos": 3, "pull_up": "embutido no modulo", "ordem": "ler a serigrafia: varia por fabricante" },
+        { "pinos": 4, "pull_up": "resistor externo de 10k entre VCC e DATA", "ordem": "VCC, DATA, NC, GND (grade virada para voce, esquerda para direita)" }
+      ],
+      "grandezas": ["temperatura_c", "umidade_pct"]
+    },
+    {
+      "id": "mq135",
+      "nome": "Sensor de qualidade do ar MQ-135",
+      "tipo": "analogico",
+      "alimentacao": "Vin",
+      "corrente_aquecedor_ma": 150,
+      "condicionamento": {
+        "necessario": true,
+        "tipo": "divisor de tensao resistivo",
+        "razao": "1:2",
+        "resistores_ohm": [10000, 10000],
+        "motivo": "A saida AO chega a 5 V; o A0 aceita no maximo ~3,3 V. Sem o divisor a leitura satura em 1023 permanentemente."
+      },
+      "calibracao": {
+        "burn_in_horas": [24, 48],
+        "pre_aquecimento_min": 3,
+        "unidade": "ADC bruto",
+        "nota": "Nao e ppm. Converter exige a curva do datasheet e um ponto de referencia conhecido."
+      },
+      "grandezas": ["gas_adc"]
+    },
+    { "id": "led_verde",    "nome": "LED verde",    "tipo": "saida_digital", "resistor_serie_ohm": 220, "significado": "ar BOM" },
+    { "id": "led_amarelo",  "nome": "LED amarelo",  "tipo": "saida_digital", "resistor_serie_ohm": 220, "significado": "ar MODERADO" },
+    { "id": "led_vermelho", "nome": "LED vermelho", "tipo": "saida_digital", "resistor_serie_ohm": 220, "significado": "ar RUIM" },
+    { "id": "buzzer",       "nome": "Buzzer ativo",  "tipo": "saida_digital", "significado": "alarme na faixa RUIM" }
+  ],
+
+  "ligacoes": [
+    { "de": "dht11.VCC",  "para": "nodemcu.3V3", "cor_sugerida": "vermelho" },
+    { "de": "dht11.GND",  "para": "nodemcu.GND", "cor_sugerida": "preto" },
+    { "de": "dht11.DATA", "para": "nodemcu.D2",  "gpio": 4, "cor_sugerida": "verde" },
+
+    { "de": "mq135.VCC",  "para": "nodemcu.Vin", "cor_sugerida": "vermelho" },
+    { "de": "mq135.GND",  "para": "nodemcu.GND", "cor_sugerida": "preto" },
+    { "de": "mq135.AO",   "para": "divisor.entrada", "cor_sugerida": "amarelo" },
+    { "de": "divisor.saida", "para": "nodemcu.A0", "cor_sugerida": "amarelo" },
+
+    { "de": "nodemcu.D5", "para": "led_verde.anodo",    "gpio": 14, "via": "resistor 220 ohm" },
+    { "de": "nodemcu.D6", "para": "led_amarelo.anodo",  "gpio": 12, "via": "resistor 220 ohm" },
+    { "de": "nodemcu.D7", "para": "led_vermelho.anodo", "gpio": 13, "via": "resistor 220 ohm" },
+    { "de": "led_verde.catodo",    "para": "nodemcu.GND" },
+    { "de": "led_amarelo.catodo",  "para": "nodemcu.GND" },
+    { "de": "led_vermelho.catodo", "para": "nodemcu.GND" },
+
+    { "de": "nodemcu.D1", "para": "buzzer.positivo", "gpio": 5 },
+    { "de": "buzzer.negativo", "para": "nodemcu.GND" }
+  ],
+
+  "limiares": {
+    "unidade": "ADC bruto (0..1023)",
+    "calibrado": false,
+    "nota": "Valores iniciais de chute. Substituir pelo valor de repouso medido em ar limpo.",
+    "faixas": [
+      { "nome": "BOM",      "min": 0,    "max": 299,  "led": "led_verde" },
+      { "nome": "MODERADO", "min": 300,  "max": 599,  "led": "led_amarelo" },
+      { "nome": "RUIM",     "min": 600,  "max": 1023, "led": "led_vermelho", "alarme": true }
+    ]
+  },
+
+  "avisos": [
+    "Nao alimente o DHT11 em 5 V: a linha de dados passaria a 5 V num GPIO que tolera 3,3 V.",
+    "Nao ligue a saida do MQ-135 direto no A0: use o divisor de 10k/10k.",
+    "Nao alimente o MQ-135 pelo pino 3V3: o regulador da placa nao entrega os ~150 mA do aquecedor.",
+    "O NodeMCU deve ficar a cavalo sobre a canaleta central da protoboard."
+  ]
+}

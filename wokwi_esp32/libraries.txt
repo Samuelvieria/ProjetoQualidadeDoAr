@@ -1,0 +1,4 @@
+# Bibliotecas usadas pelo sketch (o Wokwi instala sozinho ao rodar)
+DHT sensor library
+Adafruit Unified Sensor
+Adafruit BMP085 Library
